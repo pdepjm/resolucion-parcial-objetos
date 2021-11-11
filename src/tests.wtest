@@ -1,0 +1,48 @@
+import personaje.*
+import mision.*
+import tipoMision.*
+
+describe "Misiones individuales"{
+	
+	test "Las copas base de una mision individual son el doble de la dificultad "{
+		const participante = new Guerrera(fuerza = 100, tieneEstrategia = true)
+		const mision = new MisionIndividual(participantes = [participante], tipo=comun, dificultad = 10)
+		assert.equals(mision.copasBase(), 20)
+	}
+	
+	test "Una mision individual puede ser superada si el participante tiene estrategia"{
+		const participanteConEstrategia = new Guerrera(fuerza = 0, tieneEstrategia = true)
+		const mision = new MisionIndividual(participantes = [participanteConEstrategia], tipo=comun, dificultad=10)
+		assert.that(mision.puedeSerSuperada())
+	}
+	
+	test "Una mision individual puede ser superada si la destreza del participante supera la dificultad de la misión"{
+		const participanteConFuerza = new Guerrera(fuerza = 100, tieneEstrategia = false)
+		const mision = new MisionIndividual(participantes = [participanteConFuerza], tipo=comun, dificultad=10)
+		assert.that(mision.puedeSerSuperada())
+	}
+	
+	test "Una mision individual no puede ser superada si el participante no tiene estrategia y su destreza no supera la dificultad de la mision"{
+		const participante = new Guerrera(fuerza = 0, tieneEstrategia = false)
+		const mision = new MisionIndividual(participantes = [participante], tipo=comun, dificultad=10)
+		assert.notThat(mision.puedeSerSuperada())
+	}
+	
+}
+
+describe "Misiones"{
+	
+	test "Al superar una mision se reparten las copas en juego a sus participantes"{
+		const participante = new Guerrera(fuerza= 100, tieneEstrategia = true, copas = 10)
+		const mision = new MisionIndividual(participantes=[participante], tipo=comun, dificultad=10)
+		mision.realizarse()
+		assert.equals(participante.copas(), mision.copasEnJuego()+10)
+	}
+	
+	test "Al no poder superar una mision se restan las copas en juego a sus participantes"{
+		const participante = new Guerrera(fuerza= 0, tieneEstrategia = false, copas = 10)
+		const mision = new MisionIndividual(participantes=[participante], tipo=comun, dificultad=10)
+		mision.realizarse()
+		assert.equals(participante.copas(), 10-mision.copasEnJuego())
+	}
+}
